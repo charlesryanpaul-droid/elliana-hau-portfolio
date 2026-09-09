@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
+    timeout-minutes: 12
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,6 +31,21 @@ jobs:
         run: python -m playwright install --with-deps chromium
       - name: Build site and import original artwork
         run: python build.py
+      - name: Validate publishing directory
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('_site')
+          for name in ('index.html', 'styles.css', 'app.js'):
+              path = root / name
+              assert path.is_file() and path.stat().st_size > 100, f'Missing publishing file: {path}'
+          manifest = json.loads((root / 'media/manifest.json').read_text())
+          assert len(manifest) == 20 and all(item['ok'] for item in manifest)
+          assert all((root / item['path']).is_file() for item in manifest)
+          (root / '.nojekyll').touch()
+          print('Publishing root contains index.html, CSS, JavaScript, and all 20 images.')
+          PY
       - name: Browser layout and interaction checks
         run: python qa.py
       - name: Save browser verification and screenshots
@@ -54,7 +70,7 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify live website and all artwork
+      - name: Verify exact public URLs and all artwork
         env:
           SITE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
@@ -63,38 +79,89 @@ jobs:
           from pathlib import Path
           base = os.environ['SITE_URL'].rstrip('/') + '/'
           version = os.environ['GITHUB_SHA']
-          checks = []
-          for path in ['index.html', 'styles.css', 'app.js']:
-              route = '' if path == 'index.html' else path
-              url = base + route + '?v=' + version
-              expected = (Path('_site') / path).read_bytes()
-              for attempt in range(10):
+          report = {'url': base, 'commit': version, 'success': False, 'checks': []}
+          Path('_live').mkdir(exist_ok=True)
+          def verify(route, filename):
+              expected = (Path('_site') / filename).read_bytes()
+              check = {'url': base + route, 'file': filename, 'attempts': []}
+              report['checks'].append(check)
+              for attempt in range(12):
                   try:
-                      with urllib.request.urlopen(url, timeout=25) as response:
+                      request = urllib.request.Request(base + route, headers={'User-Agent': 'Mozilla/5.0 Portfolio-Public-Verification', 'Cache-Control': 'no-cache'})
+                      with urllib.request.urlopen(request, timeout=20) as response:
                           actual = response.read()
                           status = response.status
-                      assert actual == expected, 'CDN has not returned the current build yet'
-                      break
-                  except Exception:
-                      if attempt == 9:
+                          headers = dict(response.headers)
+                          final_url = response.url
+                      check['attempts'].append({'status': status, 'final_url': final_url, 'headers': headers, 'bytes': len(actual), 'matches_build': actual == expected})
+                      assert status == 200 and actual == expected, 'Public response does not match the deployed site'
+                      check.update({'status': status, 'matches_build': True, 'sha256': hashlib.sha256(actual).hexdigest()})
+                      print('PUBLIC VERIFIED:', base + route, status, 'exact build match', flush=True)
+                      return
+                  except Exception as error:
+                      check['attempts'].append({'error': str(error)})
+                      print('PUBLIC RETRY:', base + route, str(error), flush=True)
+                      if attempt == 11:
                           raise
-                      time.sleep(6)
-              checks.append({'path': path, 'status': status, 'bytes': len(actual), 'sha256': hashlib.sha256(actual).hexdigest(), 'matches_build': True})
-              print('VERIFIED', path, status, len(actual), 'bytes; exact build match', flush=True)
-          manifest = json.loads(Path('_site/media/manifest.json').read_text())
-          assert all(item['ok'] for item in manifest), 'An original artwork import failed'
-          for item in manifest:
-              request = urllib.request.Request(base + item['path'], method='HEAD')
-              with urllib.request.urlopen(request, timeout=25) as response:
-                  assert response.status == 200
-                  checks.append({'path': item['path'], 'status': response.status})
-          print('VERIFIED all', len(manifest), 'original artwork images return HTTP 200', flush=True)
-          Path('live-verification.json').write_text(json.dumps({'url': base, 'commit': version, 'success': True, 'checks': checks}, indent=2))
-          print('LIVE SITE VERIFIED:', base, flush=True)
+                      time.sleep(8)
+          try:
+              # Test the exact address given to visitors, not only a cache-busted URL.
+              for route, filename in [('', 'index.html'), ('index.html', 'index.html'), ('styles.css', 'styles.css'), ('app.js', 'app.js'), ('?v=' + version, 'index.html')]:
+                  verify(route, filename)
+              manifest = json.loads(Path('_site/media/manifest.json').read_text())
+              for item in manifest:
+                  verify(item['path'], item['path'])
+              report['success'] = True
+          finally:
+              Path('_live/http-verification.json').write_text(json.dumps(report, indent=2))
           PY
-      - name: Save live verification report
+      - name: Open the live site in a fresh browser
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          base = os.environ['SITE_URL'].rstrip('/') + '/'
+          report = {'url': base, 'success': False, 'errors': [], 'checks': []}
+          Path('_live').mkdir(exist_ok=True)
+          try:
+              with sync_playwright() as p:
+                  browser = p.chromium.launch(headless=True, args=['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
+                  page = browser.new_page(viewport={'width': 1440, 'height': 1000})
+                  page.on('pageerror', lambda error: report['errors'].append(str(error)))
+                  response = page.goto(base, wait_until='networkidle', timeout=60000)
+                  report['status'] = response.status
+                  report['final_url'] = page.url
+                  report['title'] = page.title()
+                  page.screenshot(path='_live/public-desktop.png')
+                  assert response.status == 200, 'Canonical live page returned an HTTP error'
+                  assert page.locator('#hero-title').count() == 1, 'Portfolio heading is missing'
+                  report['heading'] = page.locator('#hero-title').inner_text()
+                  report['state'] = page.evaluate('portfolioState()')
+                  assert report['state']['version'] == 2, 'Wrong site version'
+                  first = page.locator('#hero-canvas').screenshot()
+                  page.wait_for_timeout(700)
+                  second = page.locator('#hero-canvas').screenshot()
+                  assert first != second, 'Live hero animation is not advancing'
+                  report['checks'].append('Live hero animation advances')
+                  page.screenshot(path='_live/public-desktop.png')
+                  page.set_viewport_size({'width': 390, 'height': 844})
+                  page.wait_for_timeout(300)
+                  page.screenshot(path='_live/public-mobile.png')
+                  assert not report['errors'], 'Live page has JavaScript exceptions'
+                  browser.close()
+              report['success'] = True
+          finally:
+              Path('_live/browser-verification.json').write_text(json.dumps(report, indent=2))
+              print(json.dumps(report, indent=2))
+          PY
+      - name: Save live verification reports and screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: live-verification
-          path: live-verification.json
+          path: _live
+          if-no-files-found: warn
           retention-days: 7
