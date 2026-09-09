@@ -43,3 +43,49 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify live website and all artwork
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, time, urllib.request
+          from pathlib import Path
+          base = os.environ['SITE_URL'].rstrip('/') + '/'
+          version = os.environ['GITHUB_SHA']
+          checks = []
+          for path in ['index.html', 'styles.css', 'app.js']:
+              route = '' if path == 'index.html' else path
+              url = base + route + '?v=' + version
+              expected = (Path('_site') / path).read_bytes()
+              for attempt in range(10):
+                  try:
+                      with urllib.request.urlopen(url, timeout=25) as response:
+                          actual = response.read()
+                          status = response.status
+                      assert actual == expected, 'CDN has not returned the current build yet'
+                      break
+                  except Exception:
+                      if attempt == 9:
+                          raise
+                      time.sleep(6)
+              check = {'path': path, 'status': status, 'bytes': len(actual), 'sha256': hashlib.sha256(actual).hexdigest(), 'matches_build': True}
+              checks.append(check)
+              print('VERIFIED', path, status, len(actual), 'bytes; exact build match', flush=True)
+          manifest = json.loads(Path('_site/media/manifest.json').read_text())
+          assert all(item['ok'] for item in manifest), 'An original artwork import failed'
+          for item in manifest:
+              request = urllib.request.Request(base + item['path'], method='HEAD')
+              with urllib.request.urlopen(request, timeout=25) as response:
+                  assert response.status == 200
+                  checks.append({'path': item['path'], 'status': response.status})
+          print('VERIFIED all', len(manifest), 'original artwork images return HTTP 200', flush=True)
+          report = {'url': base, 'commit': version, 'success': True, 'checks': checks}
+          Path('live-verification.json').write_text(json.dumps(report, indent=2))
+          print('LIVE SITE VERIFIED:', base, flush=True)
+          PY
+      - name: Save live verification report
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-verification
+          path: live-verification.json
+          retention-days: 7
