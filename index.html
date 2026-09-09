@@ -2,108 +2,65 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="Elliana Hau. Graphic design with energy and intention. Explore brand identity, packaging, motion, and visual storytelling.">
-<meta property="og:title" content="Elliana Hau — Good ideas. Great energy.">
-<meta property="og:description" content="Distinctive identities. Expressive motion. Design that makes you feel something.">
+<meta name="description" content="Elliana Hau is a graphic designer working across brand identity, motion, packaging, and print. Distinctive ideas. A little more feeling.">
 <meta property="og:type" content="website">
-<title>Elliana Hau · Good ideas. Great energy.</title>
+<meta property="og:title" content="Elliana Hau · Made to move you">
+<meta property="og:description" content="Identity. Motion. Visual energy. Explore the graphic design portfolio of Elliana Hau.">
+<meta name="color-scheme" content="dark">
+<title>Elliana Hau · Made to move you</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="styles.css?v=2.0">
-<script defer src="app.js?v=2.0"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=2">
+<script src="app.js?v=2" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div class="reading-progress" aria-hidden="true"></div>
-<header class="nav">
-  <a class="wordmark" href="#top" aria-label="Elliana Hau, home"><span class="brand-star" aria-hidden="true">✳</span> elliana hau<span class="brand-dot">.</span></a>
-  <span class="nav-note">GRAPHIC DESIGN<br>IN GOOD COMPANY.</span>
-  <nav aria-label="Main navigation"><a href="#work">Work <sup>04</sup></a><a href="#about">About</a><a class="nav-contact" href="#contact">Let’s talk <span aria-hidden="true">↗</span></a></nav>
+<div class="progress" aria-hidden="true"></div>
+<svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="spark" viewBox="0 0 100 100"><path d="M50 0 59 32 85 15 68 41 100 50 68 59 85 85 59 68 50 100 41 68 15 85 32 59 0 50 32 41 15 15 41 32Z" fill="currentColor"/></symbol>
+</defs></svg>
+<header class="header" id="top">
+<a href="#top" class="brand" aria-label="Elliana Hau home">elliana hau<svg class="brand-spark" aria-hidden="true"><use href="#spark"/></svg></a>
+<span class="header-note">INDEPENDENT MIND.<br>DESIGN IN MOTION.</span>
+<nav class="nav" aria-label="Main navigation"><a href="#work">Work <sup>04</sup></a><a href="#play">Play</a><a href="#about">About</a><a href="#contact" class="nav-cta">Let’s talk <svg><use href="#arrow"/></svg></a></nav>
+<button class="motion-toggle" type="button" aria-label="Pause animations" aria-pressed="false"><span class="motion-icon" aria-hidden="true"><i></i><i></i><i></i></span><span class="motion-text">Motion on</span></button>
+<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav">Menu <span aria-hidden="true">+</span></button>
 </header>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden><a href="#work">The work <sup>04</sup></a><a href="#play">The play</a><a href="#about">The person</a><a href="#contact">Let’s talk ↗</a></nav>
 <main id="main">
-<section id="top" class="hero">
-  <div class="hero-top mono"><span><i class="live-dot" aria-hidden="true"></i> INDEPENDENT MIND. DISTINCTIVE DESIGN.</span><span class="hero-index">A PORTFOLIO / ELLIANA HAU</span></div>
-  <div class="hero-grid">
-    <div class="hero-copy">
-      <h1><span class="enter line-one">Good ideas.</span><span class="enter line-two">Great <em>energy.</em></span></h1>
-      <p class="hero-intro enter">I turn character into identity.<br>Ideas into movement.<br>And first impressions into a feeling.</p>
-      <div class="hero-actions enter"><a class="button solid" href="#work">Discover the work <span aria-hidden="true">↘</span></a><button class="text-link" data-reel>Play motion reel <span aria-hidden="true">↗</span></button></div>
-      <div class="hero-disciplines mono enter">IDENTITY <b>+</b> MOTION <b>+</b> PRINT <b>+</b> PACKAGING</div>
-    </div>
-    <div class="sculpture-scene enter">
-      <div class="scene-cross cross-one" aria-hidden="true">+</div><div class="scene-cross cross-two" aria-hidden="true">+</div>
-      <div class="orbit-guide" aria-hidden="true"></div>
-      <canvas id="hero-art" class="kinetic-canvas" data-shape="sculpture" aria-label="An original luminous, ribbed loop that continuously twists and rotates. Move your pointer to change the view." role="img"></canvas>
-      <span class="scene-number mono" aria-hidden="true">FIG. 01</span>
-      <span class="scene-caption mono">A GOOD IDEA NEVER STANDS STILL.</span>
-      <span class="scene-instruction mono">MOVE YOUR CURSOR ↗</span>
-    </div>
-  </div>
-  <div class="hero-bottom"><div class="mini-work" aria-hidden="true"><img src="media/fresh-08.webp" alt="" width="100" height="62"><img src="media/independent-01.webp" alt="" width="70" height="62"><span>FOUR PROJECTS.<br>FOUR DIFFERENT WORLDS.</span></div><p>Bold in expression.<br>Considered in every detail.</p><a class="scroll-link mono" href="#work">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a></div>
+<section class="hero section-pad" aria-labelledby="hero-title">
+<div class="hero-top"><span class="eyebrow"><span class="live-dot"></span> GRAPHIC DESIGN WITH A PULSE</span><span class="eyebrow hero-index">PORTFOLIO / ELLIANA HAU</span></div>
+<div class="hero-grid">
+<div class="hero-copy"><h1 id="hero-title"><span class="hero-line">Made to</span><span class="hero-line lime">move you<span class="period">.</span></span></h1><p class="hero-intro">I’m Elliana. I turn ideas into identities, motion, and visuals with a little more feeling.</p><div class="hero-links"><a href="#work" class="button solid">Explore the work <svg><use href="#arrow"/></svg></a><button class="text-link" type="button" data-reel><span class="small-play" aria-hidden="true">▶</span> Watch the reel</button></div><div class="hero-specialties"><span>Identity</span><span>Motion</span><span>Print & digital</span></div></div>
+<figure class="hero-art"><div class="art-corner top-left" aria-hidden="true">+</div><div class="art-corner top-right" aria-hidden="true">+</div><div class="art-corner bottom-left" aria-hidden="true">+</div><div class="art-corner bottom-right" aria-hidden="true">+</div><span class="art-coordinate eyebrow" aria-hidden="true">FORM / <span id="form-number">001</span></span><div class="orbit-guide" aria-hidden="true"></div><canvas id="hero-canvas" aria-label="A continuously evolving lime-green three-dimensional sculpture"></canvas><div class="sculpture-fallback" aria-hidden="true"><i></i><i></i><i></i></div><figcaption><span class="eyebrow">A LITTLE CURIOUS.<br>NEVER STANDING STILL.</span><button type="button" id="remix" class="remix" aria-label="Remix the animated sculpture">Remix the shape <span aria-hidden="true">↻</span></button></figcaption></figure>
+</div>
+<div class="hero-bottom"><span class="eyebrow">IDEAS WITH CHARACTER.<br>DESIGN WITH INTENTION.</span><a href="#work" class="scroll-link">SCROLL TO FEEL IT <span aria-hidden="true">↓</span></a><span class="eyebrow right">LESS ORDINARY.<br>MORE YOU.</span></div>
 </section>
-<div class="ticker" aria-hidden="true"><div class="ticker-track"><div>BUILT TO CONNECT <i>✳</i> MADE TO MOVE <i>✳</i> DESIGNED TO FEEL <i>✳</i> NEVER JUST DECORATION <i>✳</i></div><div>BUILT TO CONNECT <i>✳</i> MADE TO MOVE <i>✳</i> DESIGNED TO FEEL <i>✳</i> NEVER JUST DECORATION <i>✳</i></div></div></div>
-<section id="work" class="work section-pad">
-  <div class="section-heading reveal"><div><span class="mono section-kicker">01 / SELECTED WORK</span><h2>Different worlds.<br><em>Same curiosity.</em></h2></div><p>From a soda’s personality to a studio’s rhythm.<br>A few ways I make a good idea visible.</p><span class="heading-arrow" aria-hidden="true">↘</span></div>
-  <div class="projects">
-    <article class="project project-feature reveal">
-      <button class="project-visual fresh-visual" data-project="fresh" aria-label="Explore Fresh Fizz brand identity and packaging">
-        <div class="project-image fresh-main"><img src="media/fresh-08.webp" alt="Fresh Fizz organic soda packaging in bright yellow, green, blue, and brown." width="1800" height="1013" loading="lazy"></div>
-        <div class="fresh-side"><img src="media/fresh-02.webp" alt="A hand holding a Fresh Fizz can against blue sky and bubbles." width="1080" height="1080" loading="lazy"></div>
-        <span class="visual-index mono">01 / FRESH FIZZ</span><span class="open-disc" aria-hidden="true">↗</span><span class="visual-label mono">A LITTLE FIZZ. A LOT OF CHARACTER.</span>
-      </button>
-      <div class="project-caption"><div><h3><button data-project="fresh">Fresh Fizz <span aria-hidden="true">↗</span></button></h3><p>An organic soda with an unmistakable personality.</p></div><div class="project-meta"><div class="tags"><span>Identity</span><span>Custom type</span><span>Packaging</span></div><small>Created during an ACB Studio internship</small></div></div>
-    </article>
-    <article class="project reveal">
-      <button class="project-visual motion-visual" data-project="acb" aria-label="Explore ACB Studio motion design and watch the reel">
-        <img class="reel-poster" src="media/acb-01.webp" alt="A frame from the ACB Studio reel animated by Elliana Hau." width="1280" height="720" loading="lazy">
-        <div class="reel-overlay"><span class="mono">BRAND IDENTITIES, SET IN MOTION.</span><span class="play-disc" aria-hidden="true">▶</span><span class="reel-title">Never<br><em>stand still.</em></span></div>
-        <span class="visual-index mono">02 / ACB STUDIO</span><span class="open-disc" aria-hidden="true">↗</span><div class="equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      </button>
-      <div class="project-caption"><div><h3><button data-project="acb">ACB Studio <span aria-hidden="true">↗</span></button></h3><p>A studio’s identities. One moving story.</p></div><div class="tags"><span>Motion</span><span>Animation</span></div></div>
-    </article>
-    <article class="project reveal">
-      <button class="project-visual independent-visual" data-project="independent" aria-label="Explore independent music, merchandise, and identity projects">
-        <img src="media/independent-01.webp" alt="Expressive orange, yellow, and black independent music graphics for Based Negative Squad." width="1080" height="1080" loading="lazy">
-        <span class="visual-index mono">03 / INDEPENDENT VOICES</span><span class="open-disc" aria-hidden="true">↗</span><span class="visual-label mono">NOT MADE TO BLEND IN.</span>
-      </button>
-      <div class="project-caption"><div><h3><button data-project="independent">Independent voices <span aria-hidden="true">↗</span></button></h3><p>Visual worlds as individual as the people behind them.</p></div><div class="tags"><span>Music</span><span>Merchandise</span></div></div>
-    </article>
-    <article class="project project-feature reveal">
-      <button class="project-visual acuity-visual" data-project="acuity" aria-label="Explore Acuity Brands print, digital, and marketing design">
-        <div class="acuity-main"><img src="media/acuity-02.webp" alt="Sports lighting campaign artwork featuring an illuminated football stadium at sunset." width="1800" height="1013" loading="lazy"></div>
-        <div class="acuity-side"><span class="mono">ONE VOICE.<br>EVERY TOUCHPOINT.</span><img src="media/acuity-03.webp" alt="Acuity Brands trade show booth and marketing collateral." width="1800" height="1000" loading="lazy"><img src="media/acuity-01.webp" alt="Lithonia Lighting M3 Sports Lighting digital campaign banner." width="1800" height="500" loading="lazy"></div>
-        <span class="visual-index mono">04 / ACUITY BRANDS</span><span class="open-disc" aria-hidden="true">↗</span>
-      </button>
-      <div class="project-caption"><div><h3><button data-project="acuity">Acuity Brands <span aria-hidden="true">↗</span></button></h3><p>Complex ideas. Clear communication.</p></div><div class="project-meta"><div class="tags"><span>Marketing</span><span>Print</span><span>Digital</span></div><small>In collaboration with the Acuity Brands team</small></div></div>
-    </article>
-  </div>
+<div class="ticker" aria-label="Identity, motion, packaging, visual storytelling"><div class="ticker-track" aria-hidden="true"><span>IDENTITY <b>✳</b> MOTION <b>✳</b> PACKAGING <b>✳</b> VISUAL STORYTELLING <b>✳</b> </span><span>IDENTITY <b>✳</b> MOTION <b>✳</b> PACKAGING <b>✳</b> VISUAL STORYTELLING <b>✳</b> </span></div></div>
+<section class="work section-pad" id="work" aria-labelledby="work-title">
+<div class="section-heading reveal"><div><span class="eyebrow section-label">01 / SELECTED WORK</span><h2 id="work-title">Different worlds.<br><span class="muted">Same curiosity.</span></h2></div><p>No one-size-fits-all. Just a clear idea,<br class="desktop-break"> a distinct point of view, and the<br class="desktop-break"> right kind of energy.</p></div>
+<div class="work-grid">
+<article class="project reveal" style="--project-color:#beff58"><a href="https://www.ellianahau.com/fresh-fizz-sodas/" data-project="fresh" class="project-link" aria-label="Explore Fresh Fizz brand identity and packaging"><div class="project-top"><span>01 / FRESH FIZZ</span><span>BRAND WORLD</span></div><div class="project-visual fresh-visual"><div class="image-cycle"><img src="media/fresh-08.webp" alt="Fresh Fizz soda can packaging in a colorful flat-lay composition" width="1800" height="1013" loading="lazy"><img src="media/fresh-03.webp" alt="Fresh Fizz soda campaign with friends sharing cans" width="1080" height="1080" loading="lazy"></div><span class="card-action" aria-hidden="true"><svg><use href="#arrow"/></svg></span><span class="image-label">NATURALLY FULL OF CHARACTER.</span></div><div class="project-caption"><div><h3>Fresh Fizz</h3><p>A fresh take on feeling good.</p></div><span class="project-disciplines">Identity<br>Packaging + custom type</span></div></a></article>
+<article class="project reveal" style="--project-color:#ff794f"><a href="https://www.ellianahau.com/freelance/" data-project="independent" class="project-link" aria-label="Explore independent music, identity, and merchandise work"><div class="project-top"><span>02 / INDEPENDENT VOICES</span><span>CULTURE + MUSIC</span></div><div class="project-visual independent-visual"><img src="media/independent-01.webp" alt="Bold orange and black Based Negative Squad identity graphics" width="792" height="612" loading="lazy"><span class="card-action" aria-hidden="true"><svg><use href="#arrow"/></svg></span></div><div class="project-caption"><div><h3>Independent voices</h3><p>Not made to blend in.</p></div><span class="project-disciplines">Artwork + identity<br>Music + merchandise</span></div></a></article>
+<article class="project reveal" style="--project-color:#c1a0ff"><a href="https://www.ellianahau.com/acbreel/" data-project="acb" class="project-link" aria-label="Explore ACB Studio motion design"><div class="project-top"><span>03 / ACB STUDIO</span><span>MOTION COLLABORATION</span></div><div class="project-visual acb-visual"><div class="reel-orbits" aria-hidden="true"><i></i><i></i><i></i></div><img src="media/acb-01.webp" alt="A frame from the ACB Studio reel animated by Elliana Hau" width="1280" height="720" loading="lazy"><span class="play-badge" aria-hidden="true">▶</span><span class="card-action" aria-hidden="true"><svg><use href="#arrow"/></svg></span><span class="image-label">GOOD IDENTITIES. NEW MOVES.</span></div><div class="project-caption"><div><h3>ACB Studio</h3><p>Bringing a studio’s world to life.</p></div><span class="project-disciplines">Animation<br>After Effects</span></div></a></article>
+<article class="project reveal" style="--project-color:#8fe6ef"><a href="https://www.ellianahau.com/acuitybrands/" data-project="acuity" class="project-link" aria-label="Explore Acuity Brands marketing and editorial design"><div class="project-top"><span>04 / ACUITY BRANDS</span><span>PRINT + DIGITAL</span></div><div class="project-visual acuity-visual"><img src="media/acuity-02.webp" alt="Acuity Brands sports lighting marketing image featuring an illuminated football stadium at sunset" width="1800" height="1013" loading="lazy"><span class="card-action" aria-hidden="true"><svg><use href="#arrow"/></svg></span><span class="image-label">CLARITY, ACROSS EVERY TOUCHPOINT.</span></div><div class="project-caption"><div><h3>Acuity Brands</h3><p>A clear message. Everywhere.</p></div><span class="project-disciplines">Marketing design<br>Editorial + visual storytelling</span></div></a></article>
+</div>
 </section>
-<section class="playground section-pad" id="playground">
-  <div class="section-heading reveal"><div><span class="mono section-kicker">02 / A LITTLE CREATIVE ENERGY</span><h2>Always in <em>motion.</em></h2></div><p>An original motion playground for this portfolio.<br>Tap a study. Change its mood.</p><span class="loop-symbol" aria-hidden="true">✳</span></div>
-  <div class="experiments reveal">
-    <button class="experiment elastic" aria-label="Change the color of the Elastic motion study" data-experiment="elastic"><span class="experiment-top mono">01 / ELASTIC <span>↗</span></span><canvas class="kinetic-canvas" data-shape="elastic" aria-hidden="true"></canvas><span class="experiment-bottom mono">STRETCH THE POSSIBILITIES <span>↻</span></span></button>
-    <button class="experiment orbital" aria-label="Change the color of the Orbit motion study" data-experiment="orbit"><span class="experiment-top mono">02 / ORBIT <span>↗</span></span><div class="orbit-object" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b></div><span class="experiment-bottom mono">A DIFFERENT PERSPECTIVE <span>↻</span></span></button>
-    <button class="experiment rhythm" aria-label="Change the color of the Rhythm motion study" data-experiment="rhythm"><span class="experiment-top mono">03 / RHYTHM <span>↗</span></span><div class="rhythm-object" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="experiment-bottom mono">FIND YOUR OWN FREQUENCY <span>↻</span></span></button>
-  </div>
-  <div class="playground-footer mono"><span>ORIGINAL GENERATIVE STUDIES / WEBSITE MOTION SYSTEM</span><span>DESIGN IS A FEELING, TOO.</span></div>
+<section class="manifesto section-pad" aria-label="Design philosophy"><div class="manifesto-top"><span class="eyebrow">NOT JUST SEEN.</span><svg class="rotating-spark" aria-hidden="true"><use href="#spark"/></svg><span class="eyebrow">FELT.</span></div><p class="manifesto-line reveal">Good design<br>should make you<br><span class="feel">feel something<span class="feel-dot">.</span></span></p><div class="manifesto-bottom"><span class="eyebrow">MAKE IT CLEAR. MAKE IT DISTINCTIVE. MAKE IT MATTER.</span><div class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></section>
+<section class="play section-pad" id="play" aria-labelledby="play-title"><div class="section-heading reveal"><div><span class="eyebrow section-label">02 / THE PLAYGROUND</span><h2 id="play-title">Serious about design.<br><span class="muted">Room for a little play.</span></h2></div><div class="play-intro"><p>Shape. Rhythm. Unexpected turns.<br>A living visual language for this site.</p><button type="button" id="palette-toggle" class="text-link">Change the energy <span aria-hidden="true">↻</span></button></div></div>
+<div class="play-grid"><figure class="experiment reveal"><div class="experiment-head"><span class="eyebrow">001 / ORBIT</span><span class="loop-label">∞ LOOP</span></div><canvas class="experiment-canvas" data-pattern="orbit" aria-label="Looping orbital line sculpture"></canvas><figcaption><span>Find your rhythm.</span><span aria-hidden="true">↗</span></figcaption></figure><figure class="experiment reveal"><div class="experiment-head"><span class="eyebrow">002 / ELASTIC</span><span class="loop-label">∞ LOOP</span></div><canvas class="experiment-canvas" data-pattern="wave" aria-label="Looping elastic wave sculpture"></canvas><figcaption><span>Stretch the idea.</span><span aria-hidden="true">↗</span></figcaption></figure><figure class="experiment reveal"><div class="experiment-head"><span class="eyebrow">003 / BLOOM</span><span class="loop-label">∞ LOOP</span></div><canvas class="experiment-canvas" data-pattern="bloom" aria-label="Looping flower-like geometric sculpture"></canvas><figcaption><span>Let curiosity grow.</span><span aria-hidden="true">↗</span></figcaption></figure></div><div class="play-foot"><span>Move your cursor over the forms. Stay a while.</span><span class="eyebrow">ORIGINAL SITE VISUALS / NOT CLIENT PROJECTS</span></div>
 </section>
-<section class="manifesto section-pad"><div class="manifesto-line reveal"><span>Make it</span><span class="outline">clear.</span><span class="morph-flower" aria-hidden="true">✳</span><span>Make it</span><em>felt.</em></div></section>
-<section id="about" class="about section-pad">
-  <div class="about-art reveal"><span class="mono">03 / THE MIND BEHIND THE MAKING</span><div class="about-monogram" aria-hidden="true"><span>eh.</span><i class="monogram-orbit"></i><b>✳</b></div><span class="mono">A LITTLE INSTINCT. A LOT OF INTENTION.</span></div>
-  <div class="about-copy reveal"><span class="mono section-kicker">HELLO, I’M ELLIANA.</span><h2>A curious mind.<br>A considered <em>eye.</em></h2><p class="about-lead">I’m a graphic designer who moves between brand identities, expressive motion, and thoughtfully crafted print.</p><p>My work spans playful packaging, independent music, and corporate communications. Different audiences, different challenges. The common thread is finding the character of an idea and giving it a visual language of its own.</p><div class="expertise"><details open><summary><span>01</span> Identity with personality <b>+</b></summary><p>Custom typography, packaging, and visual systems that start with who a brand is, not just how it looks.</p></details><details><summary><span>02</span> Motion with meaning <b>+</b></summary><p>Rhythm, transitions, and animation that reveal an identity’s character and connect one visual world to the next.</p></details><details><summary><span>03</span> Clarity across formats <b>+</b></summary><p>Print, editorial layouts, and digital communications shaped to work together, with consistency in every detail.</p></details></div><div class="tool-line mono">AFTER EFFECTS <span>/</span> INDESIGN <span>/</span> PREMIERE PRO</div></div>
-</section>
-<section id="contact" class="contact section-pad">
-  <div class="contact-top mono"><span>04 / THE NEXT GOOD THING</span><span>GREAT WORK STARTS WITH A CONVERSATION.</span></div>
-  <div class="contact-main reveal"><h2>Let’s make<br>something <em>felt.</em></h2><a class="contact-orb" href="mailto:ellianahau@gmail.com" aria-label="Email Elliana Hau"><span class="contact-orb-ring" aria-hidden="true"></span><span aria-hidden="true">↗</span><small class="mono">SAY HELLO</small></a></div>
-  <div class="contact-bottom"><a class="email-link" href="mailto:ellianahau@gmail.com">ellianahau@gmail.com <span aria-hidden="true">↗</span></a><p>Building a team? Shaping a brand?<br>I’d love to hear what you have in mind.</p></div>
-</section>
+<section class="about section-pad" id="about" aria-labelledby="about-title"><div class="about-grid"><div class="about-visual reveal"><span class="eyebrow">THE PERSON BEHIND THE PIXELS.</span><div class="monogram" aria-hidden="true"><span>e</span><span>h</span><svg><use href="#spark"/></svg></div><div class="about-visual-bottom"><span class="eyebrow">CURIOUS MIND.<br>CONSIDERED EYE.</span><span class="about-smile" aria-hidden="true">☺</span></div></div><div class="about-copy reveal"><span class="eyebrow section-label">03 / HI, I’M ELLIANA</span><h2 id="about-title">A point of view.<br>A hands-on<br><span class="lime">way of making.</span></h2><p>I’m a graphic designer working across identities, motion, and print. My work moves between independent music, playful packaging, and corporate communications.</p><p>I like the moment an idea stops being abstract and becomes something you can see, feel, and remember.</p><div class="expertise"><details open><summary><span>01</span>Identity & packaging <b aria-hidden="true">+</b></summary><p>Personality in the letterforms. Intention in the layout. A visual language that belongs to the brand.</p></details><details><summary><span>02</span>Motion & storytelling <b aria-hidden="true">+</b></summary><p>Rhythm, transitions, and timing that give a visual identity another dimension.</p></details><details><summary><span>03</span>Print & digital <b aria-hidden="true">+</b></summary><p>One clear voice, across social content, editorial layouts, print pieces, and the places a brand needs to be.</p></details></div></div></div></section>
+<section class="contact section-pad" id="contact" aria-labelledby="contact-title"><div class="contact-top"><span class="eyebrow section-label">04 / THE NEXT GOOD THING</span><span class="eyebrow">BUILDING A TEAM? SHAPING A BRAND?</span></div><div class="contact-main"><h2 id="contact-title">Let’s make<br><span class="lime">some noise.</span></h2><a class="contact-orbit" href="mailto:ellianahau@gmail.com" aria-label="Email Elliana Hau"><svg class="orbit-text" viewBox="0 0 180 180" aria-hidden="true"><defs><path id="circle-type" d="M90 90 m-64 0 a64 64 0 1 1 128 0 a64 64 0 1 1 -128 0"/></defs><text><textPath href="#circle-type" textLength="402">GOOD THINGS START WITH A HELLO · </textPath></text></svg><svg class="contact-arrow" aria-hidden="true"><use href="#arrow"/></svg></a></div><div class="contact-bottom"><a href="mailto:ellianahau@gmail.com" class="email-link">ellianahau@gmail.com <svg aria-hidden="true"><use href="#arrow"/></svg></a><p>A good conversation is a pretty good start.</p></div></section>
 </main>
-<footer><a class="footer-brand" href="#top">elliana hau<span>✳</span></a><div class="footer-bottom mono"><span>© <span id="year">2026</span> ELLIANA HAU</span><span>GRAPHIC DESIGN. HUMAN FEELING.</span><a href="#top">BACK TO TOP ↑</a></div></footer>
-<button class="motion-toggle" id="motion-toggle" aria-pressed="false"><span class="motion-icon" aria-hidden="true">Ⅱ</span><span class="motion-label">Pause motion</span></button>
-<div class="cursor-label" aria-hidden="true">EXPLORE ↗</div>
-<dialog id="project-dialog" aria-labelledby="project-title"><div class="dialog-toolbar"><a href="#work" class="dialog-wordmark">elliana hau.</a><button class="dialog-close" aria-label="Close project">Back to work <span aria-hidden="true">×</span></button></div><div id="project-content"></div></dialog>
-<dialog id="reel-dialog" aria-labelledby="reel-heading"><div class="dialog-toolbar"><h2 id="reel-heading">ACB Studio / Motion reel</h2><button class="dialog-close" aria-label="Close motion reel">Close <span aria-hidden="true">×</span></button></div><div id="video-container"></div><p class="reel-credit">Animation: Elliana Hau. Brand identities: ACB Studio. <a href="https://www.youtube.com/watch?v=rPtnit3YFyg" target="_blank" rel="noopener">Watch on YouTube ↗</a></p></dialog>
-<noscript><p class="noscript-note">For project details, explore <a href="https://www.ellianahau.com/">Elliana’s original portfolio</a>. This site’s interactive galleries use JavaScript.</p></noscript>
+<footer class="footer"><a href="#top" class="brand">elliana hau<svg aria-hidden="true"><use href="#spark"/></svg></a><span>© <span id="year">2026</span> Elliana Hau. Work belongs to its respective owners.</span><a href="#top">Back to top ↑</a></footer>
+<dialog class="project-dialog" id="project-dialog" aria-labelledby="dialog-title"><div class="dialog-header"><span class="eyebrow">ELLIANA HAU / PROJECT NOTES</span><button type="button" class="dialog-close" aria-label="Close project">Close <span aria-hidden="true">×</span></button></div><div id="project-content"></div></dialog>
+<dialog class="reel-dialog" id="reel-dialog" aria-label="ACB Studio motion reel"><div class="dialog-header"><span class="eyebrow">ACB STUDIO / ANIMATION BY ELLIANA HAU</span><button type="button" class="dialog-close" aria-label="Close video">Close <span aria-hidden="true">×</span></button></div><div class="video-container" id="video-container"></div><p>Animation: Elliana Hau. Featured brand identities: ACB Studio. <a href="https://www.youtube.com/watch?v=rPtnit3YFyg" target="_blank" rel="noopener">Watch on YouTube ↗</a></p></dialog>
+<noscript><div class="noscript">Animations and project notes use JavaScript. The project links above still open the original work.</div></noscript>
 </body>
 </html>
