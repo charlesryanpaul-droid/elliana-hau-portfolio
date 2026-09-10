@@ -47,7 +47,7 @@ def get_image(item):
 with ThreadPoolExecutor(max_workers=4) as pool:
     results = list(pool.map(get_image, ASSETS))
 
-for name in ('index.html','styles.css','app.js','favicon.svg','social.svg','robots.txt'):
+for name in ('index.html','styles.css','slideshow.css','app.js','favicon.svg','social.svg','robots.txt'):
     source = Path(name)
     if source.is_file():
         text = source.read_text(encoding='utf-8')

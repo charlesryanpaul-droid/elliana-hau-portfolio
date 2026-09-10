@@ -7,7 +7,7 @@
   let saved = null;
   try { saved = localStorage.getItem('elliana-motion-v2'); } catch (_) {}
   let paused = reduce.matches || saved === 'off';
-  let clock = 0, last = 0, overlay = false, palette = 0, form = 0;
+  let clock = 0, last = 0, overlay = false, palette = 0;
   const root = document.documentElement;
   root.classList.add('js');
   $('#year').textContent = new Date().getFullYear();
@@ -23,7 +23,7 @@
     paused = !paused; syncMotion(); drawOnce();
     try { localStorage.setItem('elliana-motion-v2', paused ? 'off' : 'on'); } catch (_) {}
   });
-  reduce.addEventListener('change', e => { paused = e.matches; syncMotion(); });
+  reduce.addEventListener('change', e => { paused = e.matches; syncMotion(); drawOnce(); });
   const menu = $('#mobile-nav'), menuButton = $('.menu-toggle');
   function closeMenu() { menu.hidden = true; menuButton.setAttribute('aria-expanded','false'); }
   menuButton.addEventListener('click', () => {
@@ -43,123 +43,144 @@
   const colors = [[.80,1,.37],[.70,.52,1],[1,.43,.24],[.43,.94,.88]];
   $('#palette-toggle').addEventListener('click', () => { palette = (palette + 1) % colors.length; drawOnce(); });
 
-  // Software-rendered fallback: the same interactive 3D idea without requiring WebGL.
-  function sculpture2d(canvas) {
-    const ctx=canvas.getContext('2d');
-    if(!ctx){document.body.classList.add('no-webgl');return null;}
-    let w=1,h=1,visible=true,pointer=[0,0],soft=[0,0],vertices=[],normals=[],faces=[];
-    const unit=v=>{const l=Math.hypot(...v)||1;return v.map(x=>x/l);};
-    const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-    function center(t,type){if(type===1){const r=1.8+.35*Math.cos(5*t);return[r*Math.cos(t),r*Math.sin(t),.57*Math.sin(5*t)];}if(type===2){const r=1.55+.49*Math.cos(3*t);return[r*Math.cos(t),r*Math.sin(t),.62*Math.sin(3*t)];}const r=1.62+.59*Math.cos(3*t);return[r*Math.cos(2*t),r*Math.sin(2*t),.83*Math.sin(3*t)];}
-    function geometry(type){vertices=[];normals=[];faces=[];const steps=128,sides=24;
-      for(let i=0;i<=steps;i++){const t=i/steps*Math.PI*2,c=center(t,type),p=center(t+.001,type),m=center(t-.001,type),T=unit(p.map((x,j)=>x-m[j])),N=unit(cross(T,[0,0,1])),B=unit(cross(T,N)),radius=type===0?.32:type===1?.31:.42;
-        for(let j=0;j<=sides;j++){const v=j/sides*Math.PI*2,n=N.map((x,k)=>x*Math.cos(v)+B[k]*Math.sin(v));vertices.push(c.map((x,k)=>x+n[k]*radius));normals.push(n);if(i<steps&&j<sides){const a=i*(sides+1)+j,b=a+sides+1;faces.push([a,b,b+1,a+1]);}}
-      }
-    }
-    geometry(0);
-    function resize(){const dpr=Math.min(devicePixelRatio||1,2);w=canvas.clientWidth;h=canvas.clientHeight;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
-    new ResizeObserver(()=>{resize();requestAnimationFrame(drawOnce);}).observe(canvas);resize();
-    new IntersectionObserver(e=>visible=e[0].isIntersecting,{rootMargin:'80px'}).observe(canvas);
-    canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointer=[(e.clientX-r.left)/r.width*2-1,(e.clientY-r.top)/r.height*2-1];});canvas.addEventListener('pointerleave',()=>pointer=[0,0]);
-    $('#remix').addEventListener('click',()=>{form=(form+1)%3;$('#form-number').textContent=String(form+1).padStart(3,'0');geometry(form);drawOnce();});
-    return {renderer:'canvas',draw(t,force=false){if(!visible&&!force)return;soft=soft.map((x,i)=>x+(pointer[i]-x)*.05);ctx.clearRect(0,0,w,h);
-      const ax=.55+soft[1]*.28,ay=t*.261799+soft[0]*.45,az=-.2+Math.sin(t*.523599)*.13,sx=Math.sin(ax),cx=Math.cos(ax),sy=Math.sin(ay),cy=Math.cos(ay),sz=Math.sin(az),cz=Math.cos(az);
-      function rotate(v){const X=v[0]*cz-v[1]*sz,Y=v[0]*sz+v[1]*cz,Z=v[2],xx=X*cy+Z*sy,zz=-X*sy+Z*cy;return[xx,Y*cx-zz*sx,Y*sx+zz*cx];}
-      const transformed=vertices.map(rotate),ns=normals.map(rotate),size=Math.min(w,h)*1.14;
-      const projected=transformed.map(p=>[w/2+p[0]*size/(7.4-p[2]),h*.48+p[1]*size/(7.4-p[2]),p[2]]);
-      const order=faces.map(f=>({f,z:f.reduce((s,i)=>s+projected[i][2],0)})).sort((a,b)=>a.z-b.z),light=unit([-.6,-1.15,1.2]),col=colors[palette];
-      ctx.lineJoin='round';ctx.lineWidth=.7;
-      for(const entry of order){const f=entry.f,n=unit(f.reduce((sum,i)=>sum.map((v,k)=>v+ns[i][k]),[0,0,0]));const d=Math.max(0,n.reduce((s,v,k)=>s+v*light[k],0)),spec=Math.pow(Math.max(0,-n[0]*.23-n[1]*.45+n[2]*.86),46),rim=Math.pow(1-Math.abs(n[2]),2.5),tone=.18+.79*d;
-        const rgb=col.map((v,k)=>Math.min(255,Math.round((v*tone+spec*.9+[.76,1,.85][k]*rim*.18)*255)));
-        ctx.fillStyle=ctx.strokeStyle=`rgb(${rgb.join(',')})`;ctx.beginPath();f.forEach((i,j)=>{const p=projected[i];j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);});ctx.closePath();ctx.fill();ctx.stroke();
-      }
-    }};
-  }
+  // Real portfolio artwork replaces the decorative hero sculpture.
+  // The deck advances only while visible, with motion on and no open dialogs.
+  function projectSlideshow(element) {
+    const slides = $$('.hero-slide', element);
+    const pickers = $$('[data-show-slide]', element);
+    const toggle = $('#slideshow-toggle');
+    const stage = $('#showcase-stage');
+    const announcement = $('#showcase-status');
+    const interval = 5.2;
+    const transforms = [
+      'translate3d(0, 0, 0) rotate(0deg) scale(1)',
+      'translate3d(13px, -12px, 0) rotate(4deg) scale(.965)',
+      'translate3d(-13px, 10px, 0) rotate(-5deg) scale(.94)'
+    ];
+    let index = 0, elapsed = 0, previousTime = 0, rotations = 0;
+    let localPaused = false, hovered = false, visible = true, animations = [];
+    let pointerPause = null, touchStart = null, lastSwipe = -Infinity;
+    const playing = () => !paused && !localPaused && !hovered && visible && !document.hidden && !overlay;
 
-  // A small WebGL engine, with no external graphics framework or remote assets.
-  function sculpture(canvas) {
-    const gl = canvas.getContext('webgl',{alpha:true,antialias:true,powerPreference:'low-power'});
-    if(!gl) return sculpture2d(canvas);
-    const vertex = `
-      attribute vec3 aPosition; attribute vec3 aNormal; attribute vec2 aUV;
-      uniform float uTime; uniform float uAspect; uniform vec2 uPointer;
-      varying vec3 vNormal; varying vec3 vPosition; varying vec2 vUV;
-      mat3 rx(float a){float s=sin(a),c=cos(a);return mat3(1.,0.,0.,0.,c,s,0.,-s,c);}
-      mat3 ry(float a){float s=sin(a),c=cos(a);return mat3(c,0.,-s,0.,1.,0.,s,0.,c);}
-      mat3 rz(float a){float s=sin(a),c=cos(a);return mat3(c,s,0.,-s,c,0.,0.,0.,1.);}
-      void main(){
-        mat3 m=rx(.55+uPointer.y*.28)*ry(uTime*.261799+uPointer.x*.45)*rz(-.2+sin(uTime*.523599)*.13);
-        vec3 p=m*aPosition; vNormal=normalize(m*aNormal); vPosition=p; vUV=aUV;
-        float z=p.z-7.4;
-        gl_Position=vec4(p.x*2.0/uAspect,p.y*2.0,-1.0202*z-.20202,-z);
-      }`;
-    const fragment = `
-      precision mediump float;
-      varying vec3 vNormal; varying vec3 vPosition; varying vec2 vUV;
-      uniform vec3 uColor; uniform float uTime;
-      void main(){
-        vec3 n=normalize(vNormal); vec3 view=normalize(vec3(0.,0.,7.4)-vPosition);
-        vec3 light=normalize(vec3(-.6,1.15,1.2));
-        float diffuse=max(dot(n,light),0.);
-        float rim=pow(1.-max(dot(n,view),0.),2.4);
-        float spec=pow(max(dot(n,normalize(light+view)),0.),54.);
-        float spec2=pow(max(dot(n,normalize(vec3(.8,-.35,.75)+view)),0.),100.);
-        float bands=.93+.07*cos(vUV.x*6.283185*76.);
-        vec3 color=uColor*(.18+.79*diffuse)*bands;
-        color+=vec3(.91,1.,.8)*spec*.95+vec3(.72,.94,.91)*spec2*.5;
-        color+=mix(uColor,vec3(.77,1.,.86),.5)*rim*.42;
-        color+=uColor*.06*max(n.y,0.);
-        gl_FragColor=vec4(color,1.);
-      }`;
-    function shader(type, code) {
-      const s=gl.createShader(type); gl.shaderSource(s,code);gl.compileShader(s);
-      if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));return s;
+    function sync() {
+      element.style.setProperty('--showcase-accent', slides[index].dataset.accent);
+      element.classList.toggle('showcase-resting', !playing());
+      toggle.disabled = paused;
+      toggle.setAttribute('aria-label', paused ? 'Slideshow paused by the Motion off setting' : localPaused ? 'Play project slideshow' : 'Pause project slideshow');
+      toggle.title = paused ? 'Enable Motion in the navigation to autoplay the projects.' : '';
+      $('.showcase-toggle-label', toggle).textContent = paused ? 'Motion off' : localPaused ? 'Play' : 'Pause';
+      $('.showcase-pause-icon', toggle).textContent = paused || localPaused ? '▶' : 'Ⅱ';
+      pickers.forEach((button, i) => {
+        button.classList.toggle('is-current', i === index);
+        if(i === index) button.setAttribute('aria-current','true');
+        else button.removeAttribute('aria-current');
+        $('i',button).style.transform = `scaleX(${i === index ? Math.min(elapsed / interval,1) : 0})`;
+      });
     }
-    let program;
-    try {
-      program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vertex));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);
-      if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
-    } catch(error) { console.warn('Sculpture fallback:',error.message);const replacement=canvas.cloneNode();canvas.replaceWith(replacement);return sculpture2d(replacement); }
-    gl.useProgram(program);gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
-    const uniform = name => gl.getUniformLocation(program,name);
-    const uTime=uniform('uTime'),uAspect=uniform('uAspect'),uPointer=uniform('uPointer'),uColor=uniform('uColor');
-    const vertexBuffer=gl.createBuffer(),normalBuffer=gl.createBuffer(),uvBuffer=gl.createBuffer(),indexBuffer=gl.createBuffer();
-    let count=0, width=1,height=1,visible=true;
-    let pointer=[0,0],smooth=[0,0];
-    const norm=v=>{const l=Math.hypot(...v)||1;return v.map(n=>n/l);};
-    const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-    function center(t,type) {
-      if(type===1) { const r=1.8+.35*Math.cos(5*t);return [r*Math.cos(t),r*Math.sin(t),.57*Math.sin(5*t)]; }
-      if(type===2) { const r=1.55+.49*Math.cos(3*t);return [r*Math.cos(t),r*Math.sin(t),.62*Math.sin(3*t)]; }
-      const r=1.62+.59*Math.cos(3*t);return [r*Math.cos(2*t),r*Math.sin(2*t),.83*Math.sin(3*t)];
+
+    function settle() {
+      animations.forEach(animation => animation.cancel());
+      animations = [];
+      slides.forEach((slide, i) => {
+        const slot = (i - index + slides.length) % slides.length;
+        slide.classList.toggle('is-current',slot === 0);
+        slide.classList.toggle('is-next',slot === 1);
+        slide.classList.toggle('is-back',slot === 2);
+        slide.style.transform = transforms[slot];
+        slide.style.zIndex = String(3 - slot);
+        slide.inert = slot !== 0;
+        slide.setAttribute('aria-hidden', String(slot !== 0));
+        $('a',slide).tabIndex = slot === 0 ? 0 : -1;
+      });
     }
-    function geometry(type) {
-      const positions=[],normals=[],uvs=[],indices=[];const steps=272,sides=32;
-      for(let i=0;i<=steps;i++) {
-        const t=i/steps*Math.PI*2,c=center(t,type),p=center(t+.001,type),m=center(t-.001,type),tangent=norm(p.map((x,j)=>x-m[j]));
-        const N=norm(cross(tangent,[0,0,1])),B=norm(cross(tangent,N));
-        const radius=type===0?.32:type===1?.31:.42;
-        for(let j=0;j<=sides;j++) {
-          const v=j/sides*Math.PI*2,n=N.map((x,k)=>x*Math.cos(v)+B[k]*Math.sin(v));
-          positions.push(...c.map((x,k)=>x+n[k]*radius));normals.push(...n);uvs.push(i/steps,j/sides);
-          if(i<steps&&j<sides){const a=i*(sides+1)+j,b=a+sides+1;indices.push(a,b,a+1,a+1,b,b+1);}
-        }
+
+    function go(next, manual = false, direction = 1) {
+      next = (next + slides.length) % slides.length;
+      if(next === index) return;
+      // Finish any in-flight transition before responding to rapid button presses.
+      settle();
+      const old = index;
+      const from = slides.map(slide => ({transform: slide.style.transform, zIndex: slide.style.zIndex}));
+      index = next; elapsed = 0; rotations++;
+      settle();
+      if(!reduce.matches && !paused && typeof slides[0].animate === 'function') {
+        const duration = 850;
+        slides.forEach((slide, i) => {
+          const target = slide.style.transform;
+          const targetZ = slide.style.zIndex;
+          const frames = i === old ? [
+            {transform: from[i].transform, opacity: 1, zIndex: '4', offset: 0},
+            {transform: `translate3d(${-direction * 24}%, 18px, 0) rotate(${-direction * 12}deg) scale(.91)`, opacity: 0, zIndex: '4', offset: .48},
+            {transform: target, opacity: 0, zIndex: targetZ, offset: .49},
+            {transform: target, opacity: 1, zIndex: targetZ, offset: 1}
+          ] : [
+            {transform: from[i].transform, opacity: 1, zIndex: i === index ? '3' : '2'},
+            {transform: target, opacity: 1, zIndex: targetZ}
+          ];
+          animations.push(slide.animate(frames,{duration,easing:'cubic-bezier(.22,1,.36,1)'}));
+        });
       }
-      function bind(buffer,name,size,values){gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(values),gl.STATIC_DRAW);const a=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,size,gl.FLOAT,false,0,0);}
-      bind(vertexBuffer,'aPosition',3,positions);bind(normalBuffer,'aNormal',3,normals);bind(uvBuffer,'aUV',2,uvs);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(indices),gl.STATIC_DRAW);count=indices.length;
+      if(manual) announcement.textContent = slides[index].getAttribute('aria-label');
+      sync();
     }
-    geometry(0);
-    const resize=()=>{const dpr=Math.min(devicePixelRatio||1,2);width=Math.max(1,canvas.clientWidth);height=Math.max(1,canvas.clientHeight);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);gl.viewport(0,0,canvas.width,canvas.height);};
-    new ResizeObserver(()=>{resize();requestAnimationFrame(drawOnce);}).observe(canvas);resize();
-    new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;},{rootMargin:'80px'}).observe(canvas);
-    canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointer=[(e.clientX-r.left)/r.width*2-1,(e.clientY-r.top)/r.height*2-1];});
-    canvas.addEventListener('pointerleave',()=>{pointer=[0,0];});
-    canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();document.body.classList.add('no-webgl');});
-    $('#remix').addEventListener('click',()=>{form=(form+1)%3;$('#form-number').textContent=String(form+1).padStart(3,'0');geometry(form);drawOnce();});
-    return {renderer:'webgl',draw(t,force=false){if(!visible&&!force)return;smooth=smooth.map((x,i)=>x+(pointer[i]-x)*.05);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);gl.uniform1f(uTime,t);gl.uniform1f(uAspect,width/height);gl.uniform2f(uPointer,...smooth);gl.uniform3f(uColor,...colors[palette]);gl.drawElements(gl.TRIANGLES,count,gl.UNSIGNED_SHORT,0);}};
+
+    toggle.addEventListener('pointerdown', () => {pointerPause = !localPaused;});
+    toggle.addEventListener('click', () => {
+      localPaused = pointerPause === null ? !localPaused : pointerPause;
+      pointerPause = null; elapsed = 0; sync();
+    });
+    // A focused carousel remains paused until the visitor explicitly starts it.
+    element.addEventListener('focusin', () => {localPaused = true; sync();});
+    element.addEventListener('pointerenter', e => {if(e.pointerType === 'mouse'){hovered = true; sync();}});
+    element.addEventListener('pointerleave', e => {if(e.pointerType === 'mouse'){hovered = false; sync();}});
+    $('#slide-prev').addEventListener('click', () => go(index - 1,true,-1));
+    $('#slide-next').addEventListener('click', () => go(index + 1,true,1));
+    pickers.forEach(button => button.addEventListener('click', () => {
+      const next = Number(button.dataset.showSlide);
+      go(next,true,next < index ? -1 : 1);
+    }));
+    element.addEventListener('keydown', e => {
+      if(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if(e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault(); localPaused = true;
+        const direction = e.key === 'ArrowLeft' ? -1 : 1;
+        go(index + direction,true,direction);
+      }
+    });
+    stage.addEventListener('pointerdown', e => {
+      if(e.pointerType === 'touch') touchStart = {x:e.clientX,y:e.clientY};
+    },{passive:true});
+    stage.addEventListener('pointercancel', () => {touchStart = null;});
+    stage.addEventListener('pointerup', e => {
+      if(!touchStart) return;
+      const dx = e.clientX - touchStart.x, dy = e.clientY - touchStart.y;
+      touchStart = null;
+      if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        lastSwipe = performance.now(); localPaused = true;
+        go(index + (dx < 0 ? 1 : -1),true,dx < 0 ? 1 : -1);
+      }
+    },{passive:true});
+    stage.addEventListener('click', e => {
+      if(performance.now() - lastSwipe < 400){e.preventDefault();e.stopPropagation();}
+    },true);
+    new IntersectionObserver(entries => {visible = entries[0].isIntersecting;sync();},{threshold:.25}).observe(element);
+    document.addEventListener('visibilitychange',sync);
+    settle(); sync();
+    return {
+      renderer:'slideshow',
+      get state(){return {index, count:slides.length, project:$('a',slides[index]).dataset.project, rotations, playing:playing(), elapsed};},
+      draw(t,force = false) {
+        const dt = Math.max(0,t - previousTime); previousTime = t;
+        if(paused || reduce.matches) settle();
+        if(!force && playing()) {
+          elapsed += dt;
+          if(elapsed >= interval) go(index + 1);
+        }
+        sync();
+      }
+    };
   }
-  const hero = sculpture($('#hero-canvas'));
+  const hero = projectSlideshow($('#hero-showcase'));
 
   // Canvas line sculptures: a different, endlessly looping language for each experiment.
   function experiment(canvas,index) {
@@ -208,7 +229,7 @@
   const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const projectDialog=$('#project-dialog'),reelDialog=$('#reel-dialog');
   const opener=new Map();
-  function lock(){overlay=!!$('dialog[open]');document.body.style.overflow=overlay?'hidden':'';}
+  function lock(){overlay=!!$('dialog[open]');document.body.style.overflow=overlay?'hidden':'';hero.draw(clock,true);}
   function openProject(key,trigger) {
     const p=projects[key];if(!p)return;
     opener.set(projectDialog,trigger||opener.get(projectDialog));
@@ -236,5 +257,5 @@
   }
   $$('img').forEach(handleImage);
   // Expose only non-sensitive diagnostics to aid QA, not a network or tracking interface.
-  window.portfolioState=()=>({version:2,paused,form,palette,webgl:hero?.renderer==='webgl',renderer:hero?.renderer||'css',clock});
+  window.portfolioState=()=>({version:2,feature:'project-slideshow',paused,palette,renderer:hero?.renderer||'css',slideshow:hero?.state,clock});
 })();

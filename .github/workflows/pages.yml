@@ -25,6 +25,7 @@ jobs:
         with:
           path: _media
           key: portfolio-artwork-${{ hashFiles('build.py') }}
+          restore-keys: portfolio-artwork-
       - name: Install optimizer and browser test dependencies
         run: python -m pip install Pillow playwright
       - name: Install Chromium
@@ -37,16 +38,16 @@ jobs:
           import json
           from pathlib import Path
           root = Path('_site')
-          for name in ('index.html', 'styles.css', 'app.js'):
+          for name in ('index.html', 'styles.css', 'slideshow.css', 'app.js'):
               path = root / name
               assert path.is_file() and path.stat().st_size > 100, f'Missing publishing file: {path}'
           manifest = json.loads((root / 'media/manifest.json').read_text())
           assert len(manifest) == 20 and all(item['ok'] for item in manifest)
           assert all((root / item['path']).is_file() for item in manifest)
           (root / '.nojekyll').touch()
-          print('Publishing root contains index.html, CSS, JavaScript, and all 20 images.')
+          print('Publishing root contains the slideshow, styles, JavaScript, and all 20 images.')
           PY
-      - name: Browser layout and interaction checks
+      - name: Browser layout, slideshow, and gallery checks
         run: python qa.py
       - name: Save browser verification and screenshots
         if: always()
@@ -100,13 +101,11 @@ jobs:
                       return
                   except Exception as error:
                       check['attempts'].append({'error': str(error)})
-                      print('PUBLIC RETRY:', base + route, str(error), flush=True)
                       if attempt == 11:
                           raise
                       time.sleep(8)
           try:
-              # Test the exact address given to visitors, not only a cache-busted URL.
-              for route, filename in [('', 'index.html'), ('index.html', 'index.html'), ('styles.css', 'styles.css'), ('app.js', 'app.js'), ('?v=' + version, 'index.html')]:
+              for route, filename in [('', 'index.html'), ('index.html', 'index.html'), ('styles.css', 'styles.css'), ('slideshow.css', 'slideshow.css'), ('app.js', 'app.js'), ('?v=' + version, 'index.html')]:
                   verify(route, filename)
               manifest = json.loads(Path('_site/media/manifest.json').read_text())
               for item in manifest:
@@ -115,7 +114,7 @@ jobs:
           finally:
               Path('_live/http-verification.json').write_text(json.dumps(report, indent=2))
           PY
-      - name: Open the live site in a fresh browser
+      - name: Open the live slideshow in a fresh browser
         env:
           SITE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
@@ -128,27 +127,31 @@ jobs:
           Path('_live').mkdir(exist_ok=True)
           try:
               with sync_playwright() as p:
-                  browser = p.chromium.launch(headless=True, args=['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
+                  browser = p.chromium.launch(headless=True)
                   page = browser.new_page(viewport={'width': 1440, 'height': 1000})
                   page.on('pageerror', lambda error: report['errors'].append(str(error)))
                   response = page.goto(base, wait_until='networkidle', timeout=60000)
-                  report['status'] = response.status
-                  report['final_url'] = page.url
-                  report['title'] = page.title()
-                  page.screenshot(path='_live/public-desktop.png')
+                  report.update(status=response.status, final_url=page.url, title=page.title())
                   assert response.status == 200, 'Canonical live page returned an HTTP error'
                   assert page.locator('#hero-title').count() == 1, 'Portfolio heading is missing'
                   report['heading'] = page.locator('#hero-title').inner_text()
                   report['state'] = page.evaluate('portfolioState()')
-                  assert report['state']['version'] == 2, 'Wrong site version'
-                  first = page.locator('#hero-canvas').screenshot()
-                  page.wait_for_timeout(700)
-                  second = page.locator('#hero-canvas').screenshot()
-                  assert first != second, 'Live hero animation is not advancing'
-                  report['checks'].append('Live hero animation advances')
+                  assert report['state']['renderer'] == 'slideshow', 'Slideshow is not live'
+                  assert page.locator('#hero-canvas').count() == 0, 'Old sculpture remains'
+                  first = report['state']['slideshow']['rotations']
+                  page.wait_for_function('(n)=>portfolioState().slideshow.rotations > n', arg=first, timeout=12000)
+                  report['checks'].append('Live slideshow automatically advances')
+                  for i, key in enumerate(['fresh','independent','acuity']):
+                      page.click(f'[data-show-slide="{i}"]')
+                      page.wait_for_timeout(1000)
+                      assert page.evaluate('portfolioState().slideshow.project') == key
+                      page.locator('.hero-slide.is-current img').evaluate('(e)=>e.decode()')
+                      page.screenshot(path=f'_live/public-{key}.png')
+                  page.click('[data-show-slide="0"]')
+                  page.wait_for_timeout(1000)
                   page.screenshot(path='_live/public-desktop.png')
                   page.set_viewport_size({'width': 390, 'height': 844})
-                  page.wait_for_timeout(300)
+                  page.locator('#hero-showcase').scroll_into_view_if_needed()
                   page.screenshot(path='_live/public-mobile.png')
                   assert not report['errors'], 'Live page has JavaScript exceptions'
                   browser.close()
