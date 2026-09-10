@@ -15,8 +15,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=2">
-<link rel="stylesheet" href="slideshow.css?v=2.1-slideshow">
-<script src="app.js?v=2.1-slideshow" defer></script>
+<link rel="stylesheet" href="slideshow.css?v=2.2-controls">
+<script src="app.js?v=2.2-controls" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -39,28 +39,32 @@
 <div class="hero-grid">
 <div class="hero-copy"><h1 id="hero-title"><span class="hero-line">Made to</span><span class="hero-line lime">move you<span class="period">.</span></span></h1><p class="hero-intro">I’m Elliana. I turn ideas into identities, motion, and visuals with a little more feeling.</p><div class="hero-links"><a href="#work" class="button solid">Explore the work <svg><use href="#arrow"/></svg></a><button class="text-link" type="button" data-reel><span class="small-play" aria-hidden="true">▶</span> Watch the reel</button></div><div class="hero-specialties"><span>Identity</span><span>Motion</span><span>Print & digital</span></div></div>
 <div class="hero-art hero-showcase" id="hero-showcase" role="region" aria-roledescription="carousel" aria-labelledby="showcase-label">
-  <div class="showcase-top"><span class="eyebrow" id="showcase-label"><span class="showcase-dot" aria-hidden="true"></span> WORK IN ROTATION</span><button type="button" id="slideshow-toggle" class="showcase-toggle" aria-label="Pause project slideshow"><span class="showcase-pause-icon" aria-hidden="true">Ⅱ</span><span class="showcase-toggle-label">Pause</span></button></div>
+  <div class="showcase-top"><span class="eyebrow" id="showcase-label"><span class="showcase-dot" aria-hidden="true"></span> WORK IN ROTATION</span></div>
   <div class="showcase-stage" id="showcase-stage">
     <article class="hero-slide is-current" id="showcase-fresh" data-slide="0" data-accent="#ccff5e" role="group" aria-roledescription="slide" aria-label="1 of 3: Fresh Fizz">
       <a class="showcase-project" data-project="fresh" href="https://www.ellianahau.com/fresh-fizz-sodas/" aria-label="Explore Fresh Fizz, brand identity and packaging">
         <div class="showcase-image showcase-image-fresh"><img src="media/fresh-08.webp" alt="Fresh Fizz soda packaging with colorful cans and custom letterforms" width="1800" height="1013" fetchpriority="high" loading="eager" decoding="async"></div>
-        <div class="showcase-caption"><div><span class="showcase-category">IDENTITY / PACKAGING / CUSTOM TYPE</span><h3>Fresh Fizz</h3><span class="showcase-credit">Created at ACB Studio</span></div><span class="showcase-open" aria-hidden="true"><svg><use href="#arrow"/></svg></span></div>
+        <div class="showcase-caption"><div><span class="showcase-category">IDENTITY / PACKAGING / CUSTOM TYPE</span><h3>Fresh Fizz</h3><span class="showcase-credit">Created at ACB Studio</span></div></div>
       </a>
     </article>
     <article class="hero-slide is-next" id="showcase-independent" data-slide="1" data-accent="#ff794f" role="group" aria-roledescription="slide" aria-label="2 of 3: Independent voices" aria-hidden="true" inert>
       <a class="showcase-project" data-project="independent" href="https://www.ellianahau.com/freelance/" aria-label="Explore Independent voices, music and identity design" tabindex="-1">
         <div class="showcase-image showcase-image-independent"><img src="media/independent-01.webp" alt="Orange and black Based Negative Squad identity explorations" width="792" height="612" loading="eager" fetchpriority="low" decoding="async"></div>
-        <div class="showcase-caption"><div><span class="showcase-category">MUSIC / IDENTITY / ARTWORK</span><h3>Independent voices</h3><span class="showcase-credit">Selected freelance work</span></div><span class="showcase-open" aria-hidden="true"><svg><use href="#arrow"/></svg></span></div>
+        <div class="showcase-caption"><div><span class="showcase-category">MUSIC / IDENTITY / ARTWORK</span><h3>Independent voices</h3><span class="showcase-credit">Selected freelance work</span></div></div>
       </a>
     </article>
     <article class="hero-slide is-back" id="showcase-acuity" data-slide="2" data-accent="#8fe6ef" role="group" aria-roledescription="slide" aria-label="3 of 3: Acuity Brands" aria-hidden="true" inert>
       <a class="showcase-project" data-project="acuity" href="https://www.ellianahau.com/acuitybrands/" aria-label="Explore Acuity Brands, marketing and visual storytelling" tabindex="-1">
         <div class="showcase-image showcase-image-acuity"><img src="media/acuity-02.webp" alt="Lithonia Lighting sports campaign showing an illuminated football stadium at sunset" width="1800" height="1013" loading="eager" fetchpriority="low" decoding="async"></div>
-        <div class="showcase-caption"><div><span class="showcase-category">MARKETING / PRINT + DIGITAL</span><h3>Acuity Brands</h3><span class="showcase-credit">Marketing team collaboration</span></div><span class="showcase-open" aria-hidden="true"><svg><use href="#arrow"/></svg></span></div>
+        <div class="showcase-caption"><div><span class="showcase-category">MARKETING / PRINT + DIGITAL</span><h3>Acuity Brands</h3><span class="showcase-credit">Marketing team collaboration</span></div></div>
       </a>
     </article>
+    <div class="showcase-arrows" role="group" aria-label="Browse featured projects">
+      <button type="button" id="slide-prev" aria-label="Previous featured project" aria-controls="showcase-stage"><span aria-hidden="true">&lt;</span></button>
+      <button type="button" id="slide-next" aria-label="Next featured project" aria-controls="showcase-stage"><span aria-hidden="true">&gt;</span></button>
+    </div>
   </div>
-  <div class="showcase-bottom"><div class="showcase-pickers" role="group" aria-label="Choose a featured project"><button type="button" class="showcase-picker is-current" data-show-slide="0" aria-label="Show Fresh Fizz" aria-current="true" aria-controls="showcase-fresh"><span>01</span><span class="showcase-track" aria-hidden="true"><i></i></span></button><button type="button" class="showcase-picker" data-show-slide="1" aria-label="Show Independent voices" aria-controls="showcase-independent"><span>02</span><span class="showcase-track" aria-hidden="true"><i></i></span></button><button type="button" class="showcase-picker" data-show-slide="2" aria-label="Show Acuity Brands" aria-controls="showcase-acuity"><span>03</span><span class="showcase-track" aria-hidden="true"><i></i></span></button></div><div class="showcase-arrows"><button type="button" id="slide-prev" aria-label="Previous featured project">←</button><button type="button" id="slide-next" aria-label="Next featured project">→</button></div></div>
+  <div class="showcase-bottom"><div class="showcase-pickers" role="group" aria-label="Choose a featured project"><button type="button" class="showcase-picker is-current" data-show-slide="0" aria-label="Show Fresh Fizz" aria-current="true" aria-controls="showcase-fresh"><span>01</span><span class="showcase-track" aria-hidden="true"><i></i></span></button><button type="button" class="showcase-picker" data-show-slide="1" aria-label="Show Independent voices" aria-controls="showcase-independent"><span>02</span><span class="showcase-track" aria-hidden="true"><i></i></span></button><button type="button" class="showcase-picker" data-show-slide="2" aria-label="Show Acuity Brands" aria-controls="showcase-acuity"><span>03</span><span class="showcase-track" aria-hidden="true"><i></i></span></button></div></div>
   <span class="showcase-sr" id="showcase-status" role="status" aria-live="polite" aria-atomic="true"></span>
 </div>
 </div>

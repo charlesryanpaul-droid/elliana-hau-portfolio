@@ -48,7 +48,6 @@
   function projectSlideshow(element) {
     const slides = $$('.hero-slide', element);
     const pickers = $$('[data-show-slide]', element);
-    const toggle = $('#slideshow-toggle');
     const stage = $('#showcase-stage');
     const announcement = $('#showcase-status');
     const interval = 5.2;
@@ -59,17 +58,12 @@
     ];
     let index = 0, elapsed = 0, previousTime = 0, rotations = 0;
     let localPaused = false, hovered = false, visible = true, animations = [];
-    let pointerPause = null, touchStart = null, lastSwipe = -Infinity;
+    let touchStart = null, lastSwipe = -Infinity;
     const playing = () => !paused && !localPaused && !hovered && visible && !document.hidden && !overlay;
 
     function sync() {
       element.style.setProperty('--showcase-accent', slides[index].dataset.accent);
       element.classList.toggle('showcase-resting', !playing());
-      toggle.disabled = paused;
-      toggle.setAttribute('aria-label', paused ? 'Slideshow paused by the Motion off setting' : localPaused ? 'Play project slideshow' : 'Pause project slideshow');
-      toggle.title = paused ? 'Enable Motion in the navigation to autoplay the projects.' : '';
-      $('.showcase-toggle-label', toggle).textContent = paused ? 'Motion off' : localPaused ? 'Play' : 'Pause';
-      $('.showcase-pause-icon', toggle).textContent = paused || localPaused ? '▶' : 'Ⅱ';
       pickers.forEach((button, i) => {
         button.classList.toggle('is-current', i === index);
         if(i === index) button.setAttribute('aria-current','true');
@@ -124,12 +118,11 @@
       sync();
     }
 
-    toggle.addEventListener('pointerdown', () => {pointerPause = !localPaused;});
-    toggle.addEventListener('click', () => {
-      localPaused = pointerPause === null ? !localPaused : pointerPause;
-      pointerPause = null; elapsed = 0; sync();
+    // The header's Motion control is the single playback control.
+    // Keyboard interaction stops autoplay until Motion is explicitly re-enabled.
+    motionButton.addEventListener('click', () => {
+      if(!paused) { localPaused = false; elapsed = 0; sync(); }
     });
-    // A focused carousel remains paused until the visitor explicitly starts it.
     element.addEventListener('focusin', () => {localPaused = true; sync();});
     element.addEventListener('pointerenter', e => {if(e.pointerType === 'mouse'){hovered = true; sync();}});
     element.addEventListener('pointerleave', e => {if(e.pointerType === 'mouse'){hovered = false; sync();}});
